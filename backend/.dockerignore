@@ -1,0 +1,16 @@
+# Secrets — passed at runtime via docker-compose env_file, never baked into the image
+.env
+
+# Dependencies — reinstalled inside the image
+node_modules/
+
+# Build artifacts
+dist/
+
+# Logs
+logs/*.log
+
+# Dev / meta
+.git/
+.gitignore
+*.md

@@ -1,0 +1,10 @@
+# Environment — never commit secrets
+.env
+
+# Dependencies & build
+node_modules/
+dist/
+
+# Logs (keep the folder, ignore the files)
+logs/*.log
+!logs/.gitkeep

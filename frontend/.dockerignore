@@ -1,0 +1,15 @@
+# Secrets — passed at runtime via docker-compose environment, never baked into the image
+.env.local
+.env.*.local
+
+# Dependencies — reinstalled inside the image
+node_modules/
+
+# Build artifacts
+.next/
+out/
+
+# Dev / meta
+.git/
+.gitignore
+*.md
