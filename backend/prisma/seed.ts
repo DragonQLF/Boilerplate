@@ -30,6 +30,11 @@ async function main() {
     name: "Test User",
     email: "test@example.com",
     password: "Password123!",
+    fetchOptions: {
+      headers: {
+        origin: "http://localhost:4000",
+      },
+    },
   });
 
   if (error) {

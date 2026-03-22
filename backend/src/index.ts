@@ -200,8 +200,7 @@ app.post("/api/auth/reset-password", authLimiter);
 // Enforce password rules before Better Auth sees the request.
 // Better Auth's password.validate hook is not called on sign-up in this version.
 app.post("/api/auth/sign-up/email", authLimiter, validate(signUpSchema));
-app.all("/api/auth/*", toNodeHandler(auth));
-
+app.all("/api/auth/*splat", toNodeHandler(auth));
 // ── 5. Feature routes ─────────────────────────────────────────────────────────
 app.use("/api/auth", authRoutes);
 
