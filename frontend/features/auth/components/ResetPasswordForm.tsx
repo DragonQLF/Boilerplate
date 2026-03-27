@@ -18,17 +18,12 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import { authClient } from "../lib/auth-client";
+import { passwordSchema } from "../lib/password";
 import { FormSkeleton } from "./FormSkeleton";
 
 const resetSchema = z
   .object({
-    password: z
-      .string()
-      .min(8, "Password must be at least 8 characters")
-      .max(72, "Password must be at most 72 characters")
-      .regex(/[A-Z]/, "Must contain at least one uppercase letter")
-      .regex(/[0-9]/, "Must contain at least one number")
-      .regex(/[^A-Za-z0-9]/, "Must contain at least one special character"),
+    password: passwordSchema,
     confirmPassword: z.string().min(1, "Please confirm your password"),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -86,8 +81,7 @@ function PasswordChanged() {
         <div className="reset-success-eyebrow">All done</div>
         <h2 className="reset-success-title">Password changed</h2>
         <p className="reset-success-body">
-          Your password has been updated. You can now sign in with your new
-          password.
+          Your password has been updated. You can now sign in with your new password.
         </p>
         <hr className="reset-success-divider" />
         <p className="reset-success-hint">
@@ -144,8 +138,7 @@ function InvalidToken() {
         <div className="reset-invalid-eyebrow">Link expired</div>
         <h2 className="reset-invalid-title">Invalid reset link</h2>
         <p className="reset-invalid-body">
-          This password reset link is invalid or has expired. Reset links are
-          valid for 1 hour.
+          This password reset link is invalid or has expired. Reset links are valid for 1 hour.
         </p>
         <hr className="reset-invalid-divider" />
         <p className="reset-invalid-hint">
@@ -200,10 +193,7 @@ export function ResetPasswordForm() {
       });
 
       if (error) {
-        if (
-          error.code === "INVALID_TOKEN" ||
-          error.code === "TOKEN_EXPIRED"
-        ) {
+        if (error.code === "INVALID_TOKEN" || error.code === "TOKEN_EXPIRED") {
           setInvalidToken(true);
           return;
         }
@@ -270,14 +260,14 @@ export function ResetPasswordForm() {
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full mt-2" disabled={isLoading}>
+        <Button type="submit" className="mt-2 w-full" disabled={isLoading}>
           {isLoading ? "Updating..." : "Update password"}
         </Button>
-        <p className="text-center text-sm text-muted-foreground pt-6 mt-2 border-t border-gray-200">
+        <p className="mt-2 border-t border-gray-200 pt-6 text-center text-sm text-muted-foreground">
           Remember your password?{" "}
           <Link
             href="/login"
-            className="text-primary underline-offset-4 hover:underline font-medium"
+            className="font-medium text-primary underline-offset-4 hover:underline"
           >
             Sign in
           </Link>

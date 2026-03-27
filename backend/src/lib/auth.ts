@@ -1,6 +1,7 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import prisma from "./prisma";
+import { passwordSchema } from "../features/auth/auth.validation";
 import { sendEmail } from "./email";
 import { checkEmailRateLimit } from "../middleware/rateLimiter";
 import { auditLog } from "./audit";
@@ -76,16 +77,9 @@ export const auth = betterAuth({
     // Note: password.validate is not called by Better Auth on sign-up in this version.
     // Password rules are enforced via Express middleware in index.ts using signUpSchema.
     // This validate hook runs on password change/reset only — kept as a defence-in-depth
-    // check for those flows.
+    // check for those flows. Uses the same passwordSchema as auth.validation.ts.
     password: {
-      validate(password: string) {
-        if (password.length < 8) return false;
-        if (password.length > 72) return false;
-        if (!/[A-Z]/.test(password)) return false;
-        if (!/[0-9]/.test(password)) return false;
-        if (!/[^A-Za-z0-9]/.test(password)) return false;
-        return true;
-      },
+      validate: (password: string) => passwordSchema.safeParse(password).success,
     },
   },
 
@@ -113,8 +107,8 @@ export const auth = betterAuth({
   },
 
   session: {
-    expiresIn: 60 * 60 * 24 * 7,   // 7 days
-    updateAge: 60 * 60 * 24,         // refresh if older than 1 day
+    expiresIn: 60 * 60 * 24 * 7, // 7 days
+    updateAge: 60 * 60 * 24, // refresh if older than 1 day
     cookieCache: {
       enabled: true,
       maxAge: 5 * 60,
@@ -137,7 +131,9 @@ export const auth = betterAuth({
   // if the var were missing, silently accepting any origin.
   trustedOrigins:
     process.env.NODE_ENV === "production"
-      ? (process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : [])
+      ? process.env.FRONTEND_URL
+        ? [process.env.FRONTEND_URL]
+        : []
       : ["http://localhost:3000"],
 
   advanced: {

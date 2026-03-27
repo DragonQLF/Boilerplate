@@ -17,21 +17,19 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { authClient } from "../lib/auth-client";
+import { passwordSchema } from "../lib/password";
 import { CheckEmail } from "./CheckEmail";
 import { FormSkeleton } from "./FormSkeleton";
 import { getAppUrl } from "@/lib/getAppUrl";
 
 const registerSchema = z
   .object({
-    name: z.string().min(2, "Name must be at least 2 characters").max(100, "Name must be at most 100 characters"),
-    email: z.string().email("Invalid email address"),
-    password: z
+    name: z
       .string()
-      .min(8, "Password must be at least 8 characters")
-      .max(72, "Password must be at most 72 characters")
-      .regex(/[A-Z]/, "Must contain at least one uppercase letter")
-      .regex(/[0-9]/, "Must contain at least one number")
-      .regex(/[^A-Za-z0-9]/, "Must contain at least one special character"),
+      .min(2, "Name must be at least 2 characters")
+      .max(100, "Name must be at most 100 characters"),
+    email: z.string().email("Invalid email address"),
+    password: passwordSchema,
     confirmPassword: z.string().min(1, "Please confirm your password"),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -121,7 +119,12 @@ export function RegisterForm() {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="••••••••" autoComplete="new-password" {...field} />
+                <Input
+                  type="password"
+                  placeholder="••••••••"
+                  autoComplete="new-password"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -134,18 +137,26 @@ export function RegisterForm() {
             <FormItem>
               <FormLabel>Confirm password</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="••••••••" autoComplete="new-password" {...field} />
+                <Input
+                  type="password"
+                  placeholder="••••••••"
+                  autoComplete="new-password"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full mt-2" disabled={isLoading}>
+        <Button type="submit" className="mt-2 w-full" disabled={isLoading}>
           {isLoading ? "Creating account..." : "Create account"}
         </Button>
-        <p className="text-center text-sm text-muted-foreground pt-6 mt-2 border-t border-gray-200">
+        <p className="mt-2 border-t border-gray-200 pt-6 text-center text-sm text-muted-foreground">
           Already have an account?{" "}
-          <Link href="/login" className="text-primary underline-offset-4 hover:underline font-medium">
+          <Link
+            href="/login"
+            className="font-medium text-primary underline-offset-4 hover:underline"
+          >
             Sign in
           </Link>
         </p>
