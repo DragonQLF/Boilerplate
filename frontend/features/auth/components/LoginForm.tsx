@@ -18,7 +18,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import { authClient } from "../lib/auth-client";
-import { CheckEmail } from "./CheckEmail";
 import { FormSkeleton } from "./FormSkeleton";
 
 const loginSchema = z.object({
@@ -40,8 +39,6 @@ export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
-  const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
-
   // Redirect already-authenticated users away from the login page.
   // This is a UX guard only — real security is enforced server-side.
   const { data: session, isPending } = authClient.useSession();
@@ -69,10 +66,6 @@ export function LoginForm() {
       });
 
       if (error) {
-        if (error.code === "EMAIL_NOT_VERIFIED") {
-          setUnverifiedEmail(values.email);
-          return;
-        }
         toast({
           variant: "destructive",
           title: "Sign in failed",
@@ -91,26 +84,6 @@ export function LoginForm() {
     } finally {
       setIsLoading(false);
     }
-  }
-
-  if (unverifiedEmail) {
-    return (
-      <CheckEmail
-        email={unverifiedEmail}
-        eyebrow="One step left"
-        title="Verify your email"
-        body="{email} hasn't been verified yet. Check your inbox for the verification link we sent when you signed up."
-        hint={
-          <>
-            Can&apos;t find it? Check your spam folder.
-            <br />
-            <Link href="/register" className="check-email-link">
-              Back to sign up
-            </Link>
-          </>
-        }
-      />
-    );
   }
 
   return (
@@ -136,7 +109,12 @@ export function LoginForm() {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="••••••••" autoComplete="current-password" {...field} />
+                <Input
+                  type="password"
+                  placeholder="••••••••"
+                  autoComplete="current-password"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -145,17 +123,20 @@ export function LoginForm() {
         <div className="text-right">
           <Link
             href="/forgot-password"
-            className="text-xs text-muted-foreground hover:text-primary underline-offset-4 hover:underline"
+            className="text-xs text-muted-foreground underline-offset-4 hover:text-primary hover:underline"
           >
             Forgot password?
           </Link>
         </div>
-        <Button type="submit" className="w-full mt-2" disabled={isLoading}>
+        <Button type="submit" className="mt-2 w-full" disabled={isLoading}>
           {isLoading ? "Signing in..." : "Sign in"}
         </Button>
-        <p className="text-center text-sm text-muted-foreground pt-6 mt-2 border-t border-gray-200">
+        <p className="mt-2 border-t border-gray-200 pt-6 text-center text-sm text-muted-foreground">
           Don&apos;t have an account?{" "}
-          <Link href="/register" className="text-primary underline-offset-4 hover:underline font-medium">
+          <Link
+            href="/register"
+            className="font-medium text-primary underline-offset-4 hover:underline"
+          >
             Create one
           </Link>
         </p>
