@@ -95,25 +95,20 @@ export function ForgotPasswordForm() {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input
-                  type="email"
-                  placeholder="you@example.com"
-                  autoComplete="email"
-                  {...field}
-                />
+                <Input type="email" placeholder="you@example.com" autoComplete="email" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full mt-2" disabled={isLoading}>
+        <Button type="submit" className="mt-2 w-full" disabled={isLoading}>
           {isLoading ? "Sending..." : "Send reset link"}
         </Button>
-        <p className="text-center text-sm text-muted-foreground pt-6 mt-2 border-t border-gray-200">
+        <p className="mt-2 border-t border-gray-200 pt-6 text-center text-sm text-muted-foreground">
           Remember your password?{" "}
           <Link
             href="/login"
-            className="text-primary underline-offset-4 hover:underline font-medium"
+            className="font-medium text-primary underline-offset-4 hover:underline"
           >
             Sign in
           </Link>

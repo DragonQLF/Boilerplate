@@ -160,20 +160,24 @@ export default function ForgotPasswordPage() {
       <div className="logi">
         <div className="logi-panel">
           <div className="logi-panel-top">
-            <Link href="/" className="logi-logo">Stack</Link>
+            <Link href="/" className="logi-logo">
+              Stack
+            </Link>
           </div>
           <div className="logi-panel-bottom">
             <div className="logi-tagline">
               <p className="logi-tagline-text">
-                Everything you need to build production-quality software,
-                assembled and ready to ship.
+                Everything you need to build production-quality software, assembled and ready to
+                ship.
               </p>
             </div>
             <Link href="/login" className="logi-back">
               ← Back to sign in
             </Link>
           </div>
-          <div className="logi-ghost" aria-hidden="true">Stack</div>
+          <div className="logi-ghost" aria-hidden="true">
+            Stack
+          </div>
         </div>
 
         <div className="logi-form-side">

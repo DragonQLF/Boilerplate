@@ -303,18 +303,25 @@ export default function LandingPage() {
       <div className="lp">
         {/* Nav */}
         <nav className="lp-nav">
-          <Link href="/" className="lp-logo">Stack</Link>
+          <Link href="/" className="lp-logo">
+            Stack
+          </Link>
           <ul className="lp-nav-links">
-            {!isLoading && (
-              isAuthenticated ? (
-                <li><Link href="/dashboard">Dashboard →</Link></li>
+            {!isLoading &&
+              (isAuthenticated ? (
+                <li>
+                  <Link href="/dashboard">Dashboard →</Link>
+                </li>
               ) : (
                 <>
-                  <li><Link href="/login">Sign in</Link></li>
-                  <li><Link href="/register">Register</Link></li>
+                  <li>
+                    <Link href="/login">Sign in</Link>
+                  </li>
+                  <li>
+                    <Link href="/register">Register</Link>
+                  </li>
                 </>
-              )
-            )}
+              ))}
             <li>
               <a href="https://github.com" target="_blank" rel="noopener noreferrer">
                 GitHub ↗
@@ -327,13 +334,13 @@ export default function LandingPage() {
         <section className="lp-hero">
           <div className="lp-eyebrow">Full-stack boilerplate</div>
           <h1 className="lp-h1">
-            Ship your idea,<br />
+            Ship your idea,
+            <br />
             <em>not the setup.</em>
           </h1>
           <p className="lp-sub">
-            A production-ready foundation for serious applications. Authentication,
-            database, API, and UI — assembled with precision so you can focus on
-            what only you can build.
+            A production-ready foundation for serious applications. Authentication, database, API,
+            and UI — assembled with precision so you can focus on what only you can build.
           </p>
           <div className="lp-ctas">
             <Link href="/register" className="lp-btn-p">

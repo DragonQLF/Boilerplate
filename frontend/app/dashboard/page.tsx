@@ -34,14 +34,23 @@ function Avatar({ name }: { name: string }) {
     .slice(0, 2)
     .toUpperCase();
   return (
-    <div style={{
-      width: 34, height: 34, borderRadius: "50%",
-      background: "#C8813A", color: "#0C0C0C",
-      display: "flex", alignItems: "center", justifyContent: "center",
-      fontWeight: 700, fontSize: "0.7rem",
-      fontFamily: "var(--font-jetbrains-mono), monospace",
-      letterSpacing: "0.05em", flexShrink: 0,
-    }}>
+    <div
+      style={{
+        width: 34,
+        height: 34,
+        borderRadius: "50%",
+        background: "#C8813A",
+        color: "#0C0C0C",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontWeight: 700,
+        fontSize: "0.7rem",
+        fontFamily: "var(--font-jetbrains-mono), monospace",
+        letterSpacing: "0.05em",
+        flexShrink: 0,
+      }}
+    >
       {initials}
     </div>
   );
@@ -78,7 +87,9 @@ export default function DashboardPage() {
           @keyframes pulse { 0%,100%{opacity:0.3} 50%{opacity:1} }
           .dash-loader span { animation: pulse 1.4s ease infinite; }
         `}</style>
-        <div className="dash-loader"><span>Loading&hellip;</span></div>
+        <div className="dash-loader">
+          <span>Loading&hellip;</span>
+        </div>
       </>
     );
   }
@@ -233,7 +244,9 @@ export default function DashboardPage() {
       <div className="dash">
         <nav className="dash-nav">
           <div className="dash-nav-left">
-            <a href="/" className="dash-logo">Stack</a>
+            <a href="/" className="dash-logo">
+              Stack
+            </a>
             <span className="dash-breadcrumb">Dashboard</span>
           </div>
           <div className="dash-nav-right">
@@ -242,13 +255,19 @@ export default function DashboardPage() {
               <div className="dash-user-email">{user?.email ?? "—"}</div>
             </div>
             {user && <Avatar name={user.name} />}
-            <button className="dash-signout" onClick={handleSignOut}>Sign out</button>
+            <button className="dash-signout" onClick={handleSignOut}>
+              Sign out
+            </button>
           </div>
         </nav>
 
         <main className="dash-main">
           <div className="dash-eyebrow">
-            {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
+            {new Date().toLocaleDateString("en-US", {
+              weekday: "long",
+              month: "long",
+              day: "numeric",
+            })}
           </div>
           <h1 className="dash-h1">
             {greeting}, <em>{firstName}.</em>
@@ -257,9 +276,7 @@ export default function DashboardPage() {
 
           {/* Real user data */}
           <div className="dash-profile">
-            <div className="dash-profile-avatar">
-              {user && <Avatar name={user.name} />}
-            </div>
+            <div className="dash-profile-avatar">{user && <Avatar name={user.name} />}</div>
             <div>
               <div className="dash-profile-name">{user?.name}</div>
               <div className="dash-profile-email">{user?.email}</div>

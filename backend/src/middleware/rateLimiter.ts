@@ -80,19 +80,16 @@ export const apiLimiter: RequestHandler = (req: Request, res: Response, next: Ne
   _apiLimiter ? _apiLimiter(req, res, next) : notReady(res);
 
 // ── Email send rate limiting per address ──────────────────────────────────────
-const EMAIL_RATE_LIMIT = parseInt(
-  process.env.EMAIL_RATE_LIMIT_PER_HOUR ?? "5",
-  10
-);
+const EMAIL_RATE_LIMIT = parseInt(process.env.EMAIL_RATE_LIMIT_PER_HOUR ?? "5", 10);
 
 export async function checkEmailRateLimit(email: string): Promise<boolean> {
   const key = `email-sends:${email.toLowerCase()}`;
   // Atomic pipeline: INCR then SET expiry only if key has no TTL yet (NX).
   // Avoids the race where a crash between INCR and EXPIRE leaves a permanent key.
-  const [count] = await redis.multi()
-    .incr(key)
-    .expire(key, 3600, "NX")
-    .exec() as [number, number];
+  const [count] = (await redis.multi().incr(key).expire(key, 3600, "NX").exec()) as [
+    number,
+    number,
+  ];
   return count <= EMAIL_RATE_LIMIT;
 }
 
@@ -108,10 +105,11 @@ async function getFailedLoginCount(email: string): Promise<number> {
 export async function trackFailedLogin(email: string): Promise<number> {
   const key = `failed-logins:${email.toLowerCase()}`;
   // Atomic pipeline: INCR then SET expiry only if key has no TTL yet (NX).
-  const [count] = await redis.multi()
+  const [count] = (await redis
+    .multi()
     .incr(key)
     .expire(key, FAILED_LOGIN_WINDOW_SECS, "NX")
-    .exec() as [number, number];
+    .exec()) as [number, number];
   return count;
 }
 
@@ -124,10 +122,7 @@ export async function isEmailLocked(email: string): Promise<boolean> {
 }
 
 // ── Session blacklist ─────────────────────────────────────────────────────────
-export async function blacklistSession(
-  token: string,
-  expiresAt: Date
-): Promise<void> {
+export async function blacklistSession(token: string, expiresAt: Date): Promise<void> {
   const ttl = Math.ceil((expiresAt.getTime() - Date.now()) / 1000);
   if (ttl > 0) {
     await redis.set(`blacklist:${token}`, "1", { EX: ttl });

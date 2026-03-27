@@ -181,14 +181,16 @@ export default function LoginPage() {
         {/* Left branded panel */}
         <div className="logi-panel">
           <div className="logi-panel-top">
-            <Link href="/" className="logi-logo">Stack</Link>
+            <Link href="/" className="logi-logo">
+              Stack
+            </Link>
           </div>
 
           <div className="logi-panel-bottom">
             <div className="logi-tagline">
               <p className="logi-tagline-text">
-                Everything you need to build production-quality software,
-                assembled and ready to ship.
+                Everything you need to build production-quality software, assembled and ready to
+                ship.
               </p>
             </div>
             <Link href="/" className="logi-back">
@@ -196,7 +198,9 @@ export default function LoginPage() {
             </Link>
           </div>
 
-          <div className="logi-ghost" aria-hidden="true">Stack</div>
+          <div className="logi-ghost" aria-hidden="true">
+            Stack
+          </div>
         </div>
 
         {/* Right form panel */}

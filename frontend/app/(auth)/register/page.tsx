@@ -174,7 +174,9 @@ export default function RegisterPage() {
       <div className="regi">
         <div className="regi-panel">
           <div className="regi-panel-top">
-            <Link href="/" className="regi-logo">Stack</Link>
+            <Link href="/" className="regi-logo">
+              Stack
+            </Link>
           </div>
           <div className="regi-panel-bottom">
             <div className="regi-tagline">
@@ -182,9 +184,13 @@ export default function RegisterPage() {
                 Start building in minutes, not days. Your stack is already configured.
               </p>
             </div>
-            <Link href="/" className="regi-back">← Back to home</Link>
+            <Link href="/" className="regi-back">
+              ← Back to home
+            </Link>
           </div>
-          <div className="regi-ghost" aria-hidden="true">Stack</div>
+          <div className="regi-ghost" aria-hidden="true">
+            Stack
+          </div>
         </div>
 
         <div className="regi-form-side">

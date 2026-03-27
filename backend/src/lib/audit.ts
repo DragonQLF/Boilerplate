@@ -10,9 +10,6 @@ import logger from "./logger";
  * In production, forward audit logs to a SIEM or long-term log store.
  * Filter by { audit: true } to separate audit entries from application logs.
  */
-export function auditLog(
-  event: string,
-  data: Record<string, unknown>
-): void {
+export function auditLog(event: string, data: Record<string, unknown>): void {
   logger.warn(`[AUDIT] ${event}`, { audit: true, event, ...data });
 }

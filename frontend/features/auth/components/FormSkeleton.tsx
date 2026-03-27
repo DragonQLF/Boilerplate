@@ -1,14 +1,7 @@
 import { cn } from "@/lib/utils";
 
 function Bone({ className }: { className?: string }) {
-  return (
-    <div
-      className={cn(
-        "animate-pulse rounded-md bg-gray-200",
-        className
-      )}
-    />
-  );
+  return <div className={cn("animate-pulse rounded-md bg-gray-200", className)} />;
 }
 
 function FieldSkeleton() {
@@ -26,9 +19,9 @@ export function FormSkeleton({ fields }: { fields: number }) {
       {Array.from({ length: fields }).map((_, i) => (
         <FieldSkeleton key={i} />
       ))}
-      <Bone className="h-10 w-full mt-2" />
-      <div className="pt-6 mt-2 border-t border-gray-200">
-        <Bone className="h-4 w-48 mx-auto" />
+      <Bone className="mt-2 h-10 w-full" />
+      <div className="mt-2 border-t border-gray-200 pt-6">
+        <Bone className="mx-auto h-4 w-48" />
       </div>
     </div>
   );

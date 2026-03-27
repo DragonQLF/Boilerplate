@@ -9,8 +9,7 @@ const AUTH_PAGES = ["/login", "/register", "/forgot-password", "/reset-password"
 
 function hasSessionCookie(request: NextRequest): boolean {
   const token =
-    request.cookies.get(SESSION_COOKIE_NAME) ??
-    request.cookies.get(SESSION_COOKIE_NAME_SECURE);
+    request.cookies.get(SESSION_COOKIE_NAME) ?? request.cookies.get(SESSION_COOKIE_NAME_SECURE);
   return !!token?.value;
 }
 
