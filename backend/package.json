@@ -9,7 +9,9 @@
     "start": "node dist/index.js",
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts",
-    "db:generate": "prisma generate"
+    "db:generate": "prisma generate",
+    "lint": "eslint .",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
@@ -31,6 +33,10 @@
     "@types/express": "^5.0.0",
     "@types/hpp": "^0.2.6",
     "@types/node": "^22.9.0",
+    "@typescript-eslint/eslint-plugin": "^8.57.2",
+    "@typescript-eslint/parser": "^8.57.2",
+    "eslint": "^9.39.4",
+    "prettier": "^3.8.1",
     "prisma": "^5.22.0",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2"

@@ -17,8 +17,7 @@ const envSchema = z.object({
 
 const envResult = envSchema.safeParse(process.env);
 if (!envResult.success) {
-  console.error("Missing required environment variables:");
-  console.error(envResult.error.flatten().fieldErrors);
+  console.error("Missing required environment variables:", envResult.error.flatten().fieldErrors);
   process.exit(1);
 }
 
@@ -69,14 +68,14 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc:  ["'self'"],
-        styleSrc:   ["'self'"],
-        imgSrc:     ["'self'", "data:"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'"],
+        imgSrc: ["'self'", "data:"],
         connectSrc: ["'self'"],
-        fontSrc:    ["'self'"],
-        objectSrc:  ["'none'"],
-        mediaSrc:   ["'self'"],
-        frameSrc:   ["'none'"],
+        fontSrc: ["'self'"],
+        objectSrc: ["'none'"],
+        mediaSrc: ["'self'"],
+        frameSrc: ["'none'"],
       },
     },
   })
@@ -143,8 +142,7 @@ app.post("/api/auth/sign-out", async (req, _res, next) => {
       headers: fromNodeHeaders(req.headers),
     });
     if (session?.session?.token && session.session.expiresAt) {
-      await blacklistSession(session.session.token, session.session.expiresAt)
-        .catch(() => {}); // non-fatal — sign-out proceeds regardless
+      await blacklistSession(session.session.token, session.session.expiresAt).catch(() => {}); // non-fatal — sign-out proceeds regardless
       auditLog("session_blacklisted", {
         userId: session.user?.id,
         email: session.user?.email,
