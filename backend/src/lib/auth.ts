@@ -16,6 +16,21 @@ function escapeHtml(str: string): string {
   return str.replace(/[<>"'&]/g, (c) => `&#${c.charCodeAt(0)};`);
 }
 
+/**
+ * Better Auth configuration.
+ *
+ * Email/password auth with mandatory email verification.
+ * Google OAuth is enabled when GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET are set.
+ *
+ * Security decisions:
+ * - maxPasswordLength is 72 to match bcrypt's silent truncation limit.
+ * - password.validate runs on change/reset only — sign-up validation
+ *   is handled by Zod in auth.validation.ts (Express middleware).
+ * - trustedOrigins is empty in production if FRONTEND_URL is missing,
+ *   rather than falling back to a permissive default.
+ * - Cookie sameSite is "strict" — prevents CSRF without a separate token.
+ * - secondarySecrets enables zero-downtime secret rotation via BETTER_AUTH_SECRETS.
+ */
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql",
@@ -51,12 +66,7 @@ export const auth = betterAuth({
         await sendEmail({
           to: user.email,
           subject: "Reset your password",
-          html: `
-            <p>Hi ${safeName},</p>
-            <p>We received a request to reset your password. Click the link below to choose a new one:</p>
-            <p><a href="${url}">Reset password</a></p>
-            <p>This link expires in 1 hour. If you didn't request a password reset, you can safely ignore this email.</p>
-          `,
+          html: `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head><body style="margin:0;padding:0;background:#F5F1EB;font-family:'Courier New',monospace;"><table width="100%" cellpadding="0" cellspacing="0" style="background:#F5F1EB;padding:2.5rem 1rem;"><tr><td align="center"><table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background:#F5F1EB;border:1px solid #E0DBD3;"><tr><td style="background:#0C0C0C;padding:1.75rem 2.5rem;border-bottom:3px solid #C8813A;"><table width="100%" cellpadding="0" cellspacing="0"><tr><td style="font-family:Georgia,serif;font-style:italic;font-size:20px;color:#EDE8DE;letter-spacing:-0.02em;">Stack</td><td align="right" style="font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:#4A4A4A;">Password Reset</td></tr></table></td></tr><tr><td style="padding:2.5rem 2.5rem 2rem;background:#F5F1EB;"><p style="font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:#C8813A;margin:0 0 12px;">Security notice</p><h1 style="font-family:Georgia,serif;font-size:26px;font-weight:700;color:#0C0C0C;letter-spacing:-0.025em;line-height:1.15;margin:0 0 20px;">Reset your<br><span style="font-style:italic;font-weight:400;color:#C8813A;">password.</span></h1><div style="height:1px;background:#E0DBD3;margin:24px 0;"></div><p style="font-family:'Courier New',monospace;font-size:13px;color:#1A1A1A;line-height:1.8;margin:0 0 12px;font-weight:300;">Hi ${safeName},</p><p style="font-family:'Courier New',monospace;font-size:12px;color:#4A4A4A;line-height:1.9;font-weight:300;margin:0 0 24px;">We received a request to reset the password for your Stack account. Click the button below to choose a new password.<br><br>This link expires in <strong style="color:#0C0C0C;font-weight:500;">1 hour</strong>. If you didn&#39;t request a reset, no action is needed — your password remains unchanged.</p><table cellpadding="0" cellspacing="0" style="margin:0 0 12px;"><tr><td style="background:#0C0C0C;padding:14px 32px;"><a href="${url}" style="font-family:'Courier New',monospace;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#EDE8DE;text-decoration:none;">Reset password &#8594;</a></td></tr></table><p style="font-family:'Courier New',monospace;font-size:10px;color:#888;margin:8px 0 0;">Button not working? Copy this link: <span style="color:#C8813A;font-weight:500;">${url}</span></p><div style="background:#EDE8DE;border-left:3px solid #C8813A;padding:12px 16px;margin:24px 0;"><p style="font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:#888;margin:0 0 6px;">Reset link</p><p style="font-family:'Courier New',monospace;font-size:10px;color:#C8813A;word-break:break-all;margin:0;font-weight:500;">${url}</p></div><table cellpadding="0" cellspacing="0" style="background:#EDE8DE;border:1px solid #E0DBD3;padding:16px 20px;margin:24px 0 0;width:100%;"><tr><td width="16" style="color:#C8813A;font-size:11px;font-weight:700;font-family:'Courier New',monospace;vertical-align:top;padding-top:2px;">!</td><td style="font-family:'Courier New',monospace;font-size:10px;color:#4A4A4A;line-height:1.75;font-weight:300;padding-left:10px;">If you didn&#39;t request a password reset, please ignore this email. Your account is secure and no changes have been made.</td></tr></table></td></tr><tr><td style="background:#0C0C0C;padding:24px 40px;border-top:1px solid #1E1E1E;"><table width="100%" cellpadding="0" cellspacing="0" style="border-bottom:1px solid #1E1E1E;padding-bottom:16px;margin-bottom:16px;"><tr><td style="font-family:Georgia,serif;font-style:italic;font-size:14px;color:#4A4A4A;">Stack</td><td align="right" style="font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:#2E2E2E;">Automated &middot; Do not reply</td></tr></table><p style="font-family:'Courier New',monospace;font-size:9px;color:#2E2E2E;line-height:1.75;font-weight:300;margin:0;">This is an automated message from Stack. You&#39;re receiving this because a password reset was requested for this email address.</p></td></tr></table></td></tr></table></body></html>`,
         });
         auditLog("password_reset_requested", { email: user.email });
       } catch (err) {
@@ -94,12 +104,7 @@ export const auth = betterAuth({
         await sendEmail({
           to: user.email,
           subject: "Verify your email address",
-          html: `
-            <p>Hi ${safeName},</p>
-            <p>Thanks for signing up. Click the link below to verify your email address:</p>
-            <p><a href="${url}">Verify email</a></p>
-            <p>This link expires in 24 hours. If you didn't create an account, you can ignore this email.</p>
-          `,
+          html: `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head><body style="margin:0;padding:0;background:#F5F1EB;font-family:'Courier New',monospace;"><table width="100%" cellpadding="0" cellspacing="0" style="background:#F5F1EB;padding:2.5rem 1rem;"><tr><td align="center"><table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background:#F5F1EB;border:1px solid #E0DBD3;"><tr><td style="background:#0C0C0C;padding:1.75rem 2.5rem;border-bottom:3px solid #C8813A;"><table width="100%" cellpadding="0" cellspacing="0"><tr><td style="font-family:Georgia,serif;font-style:italic;font-size:20px;color:#EDE8DE;letter-spacing:-0.02em;">Stack</td><td align="right" style="font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:#4A4A4A;">Account Verification</td></tr></table></td></tr><tr><td style="padding:2.5rem 2.5rem 2rem;background:#F5F1EB;"><p style="font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:#C8813A;margin:0 0 12px;">Action required</p><h1 style="font-family:Georgia,serif;font-size:26px;font-weight:700;color:#0C0C0C;letter-spacing:-0.025em;line-height:1.15;margin:0 0 20px;">Verify your<br><span style="font-style:italic;font-weight:400;color:#C8813A;">email address.</span></h1><div style="height:1px;background:#E0DBD3;margin:24px 0;"></div><p style="font-family:'Courier New',monospace;font-size:13px;color:#1A1A1A;line-height:1.8;margin:0 0 12px;font-weight:300;">Hi ${safeName},</p><p style="font-family:'Courier New',monospace;font-size:12px;color:#4A4A4A;line-height:1.9;font-weight:300;margin:0 0 24px;">Thanks for signing up. To activate your account, please verify your email address by clicking the button below.<br><br>This link expires in <strong style="color:#0C0C0C;font-weight:500;">24 hours</strong>.</p><table cellpadding="0" cellspacing="0" style="margin:0 0 12px;"><tr><td style="background:#0C0C0C;padding:14px 32px;"><a href="${url}" style="font-family:'Courier New',monospace;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#EDE8DE;text-decoration:none;">Verify email address &#8594;</a></td></tr></table><p style="font-family:'Courier New',monospace;font-size:10px;color:#888;margin:8px 0 0;">Button not working? Copy this link: <span style="color:#C8813A;font-weight:500;">${url}</span></p><div style="background:#EDE8DE;border-left:3px solid #C8813A;padding:12px 16px;margin:24px 0;"><p style="font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:#888;margin:0 0 6px;">Verification link</p><p style="font-family:'Courier New',monospace;font-size:10px;color:#C8813A;word-break:break-all;margin:0;font-weight:500;">${url}</p></div><table cellpadding="0" cellspacing="0" style="background:#EDE8DE;border:1px solid #E0DBD3;padding:16px 20px;margin:24px 0 0;width:100%;"><tr><td width="16" style="color:#C8813A;font-size:11px;font-weight:700;font-family:'Courier New',monospace;vertical-align:top;padding-top:2px;">!</td><td style="font-family:'Courier New',monospace;font-size:10px;color:#4A4A4A;line-height:1.75;font-weight:300;padding-left:10px;">If you didn&#39;t create a Stack account, you can safely ignore this email. Someone may have entered your address by mistake.</td></tr></table></td></tr><tr><td style="background:#0C0C0C;padding:24px 40px;border-top:1px solid #1E1E1E;"><table width="100%" cellpadding="0" cellspacing="0" style="border-bottom:1px solid #1E1E1E;padding-bottom:16px;margin-bottom:16px;"><tr><td style="font-family:Georgia,serif;font-style:italic;font-size:14px;color:#4A4A4A;">Stack</td><td align="right" style="font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:#2E2E2E;">Automated &middot; Do not reply</td></tr></table><p style="font-family:'Courier New',monospace;font-size:9px;color:#2E2E2E;line-height:1.75;font-weight:300;margin:0;">This is an automated message from Stack. You&#39;re receiving this because someone signed up for an account using this email address.</p></td></tr></table></td></tr></table></body></html>`,
         });
       } catch (err) {
         logger.error("Failed to send verification email:", err);
@@ -110,6 +115,10 @@ export const auth = betterAuth({
   session: {
     expiresIn: 60 * 60 * 24 * 7,   // 7 days
     updateAge: 60 * 60 * 24,         // refresh if older than 1 day
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60,
+    },
   },
 
   socialProviders: {

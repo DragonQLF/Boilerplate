@@ -14,6 +14,21 @@ function hasSessionCookie(request: NextRequest): boolean {
   return !!token?.value;
 }
 
+/**
+ * Next.js middleware — runs on the edge before every matched request.
+ *
+ * Two rules:
+ * 1. Authenticated users hitting auth pages (/login, /register, etc.)
+ *    are redirected to /dashboard.
+ * 2. Unauthenticated users hitting protected pages (/dashboard/*)
+ *    are redirected to /login with a callbackUrl query param.
+ *
+ * This is a UX guard only — it checks for the presence of the session
+ * cookie, not its validity. Real security is enforced server-side by
+ * requireSession middleware on the backend.
+ *
+ * Keep SESSION_COOKIE_NAME in sync with the backend auth config.
+ */
 export default function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isAuthenticated = hasSessionCookie(request);

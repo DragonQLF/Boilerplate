@@ -63,6 +63,7 @@ if (process.env.NODE_ENV === "production") {
   app.set("trust proxy", 1);
 }
 
+app.use(express.json({ limit: "10kb" }));
 app.use(
   helmet({
     contentSecurityPolicy: {
@@ -86,7 +87,6 @@ app.use(
     credentials: true,
   })
 );
-app.use(express.json({ limit: "10kb" }));
 app.use(hpp());
 app.use(globalLimiter);
 

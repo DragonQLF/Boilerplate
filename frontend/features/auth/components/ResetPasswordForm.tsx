@@ -175,6 +175,12 @@ export function ResetPasswordForm() {
     if (session?.user?.emailVerified) router.push("/dashboard");
   }, [session, router]);
 
+  useEffect(() => {
+    if (!success) return;
+    const timer = setTimeout(() => router.push("/login"), 3000);
+    return () => clearTimeout(timer);
+  }, [success, router]);
+
   const form = useForm<ResetValues>({
     resolver: zodResolver(resetSchema),
     defaultValues: { password: "", confirmPassword: "" },
@@ -210,7 +216,6 @@ export function ResetPasswordForm() {
       }
 
       setSuccess(true);
-      setTimeout(() => router.push("/login"), 3000);
     } catch {
       toast({
         variant: "destructive",
@@ -222,9 +227,9 @@ export function ResetPasswordForm() {
     }
   }
 
+  if (isPending) return <FormSkeleton fields={2} />;
   if (invalidToken) return <InvalidToken />;
   if (success) return <PasswordChanged />;
-  if (isPending) return <FormSkeleton fields={2} />;
 
   return (
     <Form {...form}>

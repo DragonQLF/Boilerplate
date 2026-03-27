@@ -1,11 +1,14 @@
 import logger from "./logger";
 
 /**
- * Logs security-relevant events to a dedicated AUDIT channel.
- * These entries should be forwarded to a SIEM or long-term log store in production.
+ * Logs security-relevant events to a dedicated AUDIT channel via Winston.
  *
- * Events to log: failed_login, successful_login, password_reset_requested,
- * password_changed, email_verified, session_blacklisted, rate_limit_hit.
+ * Events logged: failed_login, successful_login, password_reset_requested,
+ * session_blacklisted, blacklisted_session_used, account_locked_sign_in_blocked,
+ * password_reset_rate_limited, verification_email_rate_limited.
+ *
+ * In production, forward audit logs to a SIEM or long-term log store.
+ * Filter by { audit: true } to separate audit entries from application logs.
  */
 export function auditLog(
   event: string,

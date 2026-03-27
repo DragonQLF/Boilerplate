@@ -1,5 +1,5 @@
 # Stage 1 — base
-FROM node:20-alpine AS base
+FROM node:24-alpine AS base
 WORKDIR /app
 COPY package*.json ./
 
@@ -16,7 +16,7 @@ COPY . .
 RUN npm run build
 
 # Stage 4 — production (Next.js standalone)
-FROM node:20-alpine AS production
+FROM node:24-alpine AS production
 WORKDIR /app
 ENV NODE_ENV=production
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup

@@ -21,8 +21,34 @@ declare global {
 }
 
 /**
- * Validates the session cookie and attaches req.user.
- * Also checks the Redis session blacklist for instantly revoked sessions.
+ * Checks whether a session token has been blacklisted in Redis.
+ * Called by both requireSession and sensitiveAction to avoid duplication.
+ * Returns true and sends a 401 if blacklisted, false otherwise.
+ */
+async function checkBlacklist(
+  token: string,
+  user: { id: string; email: string },
+  res: Response
+): Promise<boolean> {
+  const blacklisted = await isSessionBlacklisted(token);
+  if (blacklisted) {
+    auditLog("blacklisted_session_used", { userId: user.id, email: user.email });
+    res.status(401).json({ error: "Session revoked" });
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Standard session guard — use on all protected routes.
+ *
+ * 1. Validates the session cookie via Better Auth.
+ * 2. Checks the Redis blacklist for instantly revoked sessions.
+ * 3. Ensures the user's email is verified.
+ * 4. Attaches req.user for downstream handlers.
+ *
+ * Uses Better Auth's cookie cache for performance.
+ * For sensitive operations, use sensitiveAction instead.
  */
 export async function requireSession(
   req: Request,
@@ -41,15 +67,7 @@ export async function requireSession(
 
     // Check if this session token has been blacklisted (instant revocation).
     if (session.session?.token) {
-      const blacklisted = await isSessionBlacklisted(session.session.token);
-      if (blacklisted) {
-        auditLog("blacklisted_session_used", {
-          userId: session.user.id,
-          email: session.user.email,
-        });
-        res.status(401).json({ error: "Session revoked" });
-        return;
-      }
+      if (await checkBlacklist(session.session.token, session.user, res)) return;
     }
 
     if (!session.user.emailVerified) {
@@ -65,9 +83,11 @@ export async function requireSession(
 }
 
 /**
- * Forces a fresh DB lookup on every call — use on sensitive routes
- * (password change, account deletion) to prevent stale-session attacks.
- * Also checks emailVerified and the session blacklist.
+ * Strict session guard — use on sensitive routes (password change, account deletion, payments).
+ *
+ * Same as requireSession but forces a fresh database lookup by disabling
+ * Better Auth's cookie cache. This prevents stale-session attacks where
+ * a cached session could be used after the underlying DB record was invalidated.
  */
 export async function sensitiveAction(
   req: Request,
@@ -86,16 +106,7 @@ export async function sensitiveAction(
     }
 
     if (session.session?.token) {
-      const blacklisted = await isSessionBlacklisted(session.session.token);
-      if (blacklisted) {
-        auditLog("blacklisted_session_used_on_sensitive_route", {
-          userId: session.user.id,
-          email: session.user.email,
-          path: req.path,
-        });
-        res.status(401).json({ error: "Session revoked" });
-        return;
-      }
+      if (await checkBlacklist(session.session.token, session.user, res)) return;
     }
 
     if (!session.user.emailVerified) {

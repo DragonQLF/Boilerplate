@@ -1,5 +1,5 @@
 # Stage 1 — base
-FROM node:20-alpine AS base
+FROM node:24-alpine AS base
 WORKDIR /app
 RUN apk add --no-cache openssl
 COPY package*.json ./
@@ -18,7 +18,7 @@ COPY . .
 RUN npx prisma generate && npm run build
 
 # Stage 4 — production
-FROM node:20-alpine AS production
+FROM node:24-alpine AS production
 WORKDIR /app
 ENV NODE_ENV=production
 RUN apk add --no-cache openssl && addgroup -S appgroup && adduser -S appuser -G appgroup
@@ -29,4 +29,4 @@ USER appuser
 EXPOSE 4000
 # Run pending migrations then start the server.
 # migrate deploy is idempotent — safe to run on every container start.
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/index.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node --permission --allow-net --allow-read=./dist,./node_modules --allow-env dist/index.js"]

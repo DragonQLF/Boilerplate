@@ -66,9 +66,16 @@ export function CheckEmail({
         <div className="check-email-eyebrow">{eyebrow}</div>
         <h2 className="check-email-title">{title}</h2>
         <p className="check-email-body">
-          {body.replace("{email}", "").split("{email}")[0]}
-          <span className="check-email-address">{email}</span>
-          {body.includes("{email}") ? body.split("{email}")[1] : body}
+          {(() => {
+            const [before, after = ""] = body.split("{email}");
+            return (
+              <>
+                {before}
+                <span className="check-email-address">{email}</span>
+                {after}
+              </>
+            );
+          })()}
         </p>
         <hr className="check-email-divider" />
         <p className="check-email-hint">

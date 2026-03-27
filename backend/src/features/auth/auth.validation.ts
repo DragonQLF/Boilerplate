@@ -9,6 +9,17 @@ const passwordSchema = z
   .regex(/[0-9]/, "Password must contain at least one number")
   .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character");
 
+/**
+ * Zod schema for the sign-up request body.
+ *
+ * Applied as Express middleware before Better Auth sees the request.
+ * Better Auth's own password.validate hook does not run on sign-up
+ * in the current version — this schema is the source of truth for
+ * sign-up validation.
+ *
+ * callbackURL is optional but validated against FRONTEND_URL when present
+ * to prevent open redirect attacks.
+ */
 export const signUpSchema = z.object({
   name: z
     .string()

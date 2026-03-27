@@ -18,8 +18,18 @@ let _authLimiter: RateLimitRequestHandler | undefined;
 let _apiLimiter: RateLimitRequestHandler | undefined;
 
 /**
- * Must be called after connectRedis() — initializes the Redis-backed limiters.
- * Proxy wrappers below delegate to these once set.
+ * Initialises Redis-backed rate limiters.
+ * Must be called after connectRedis() in start().
+ *
+ * Three limiters with separate Redis key namespaces:
+ * - globalLimiter  — applied to all routes (100 req / 15 min)
+ * - authLimiter    — applied to sign-in, sign-up, password reset (10 req / 15 min)
+ * - apiLimiter     — applied to authenticated API routes (60 req / 15 min)
+ *
+ * Additional per-email protections (not express-rate-limit):
+ * - checkEmailRateLimit  — max emails per address per hour (default 5)
+ * - trackFailedLogin     — locks account after 10 failures in 15 min
+ * - blacklistSession     — instantly revokes a session token in Redis
  */
 export function initializeLimiters(): void {
   _globalLimiter = rateLimit({

@@ -1,5 +1,16 @@
 import ky, { type HTTPError } from "ky";
 
+/**
+ * Pre-configured ky HTTP client for backend API calls.
+ *
+ * - prefixUrl points to NEXT_PUBLIC_API_URL so all calls use relative paths.
+ * - credentials: "include" sends the Better Auth session cookie automatically.
+ * - afterResponse hook logs non-OK responses in development for easier debugging.
+ *
+ * Usage:
+ *   const data = await api.get("your-feature/endpoint").json<YourType>();
+ *   const result = await api.post("your-feature/endpoint", { json: body }).json<YourType>();
+ */
 export const api = ky.create({
   prefixUrl: process.env.NEXT_PUBLIC_API_URL,
   credentials: "include",

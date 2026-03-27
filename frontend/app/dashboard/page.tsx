@@ -258,7 +258,7 @@ export default function DashboardPage() {
           {/* Real user data */}
           <div className="dash-profile">
             <div className="dash-profile-avatar">
-              {user?.name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()}
+              {user && <Avatar name={user.name} />}
             </div>
             <div>
               <div className="dash-profile-name">{user?.name}</div>

@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
-import { Inter, Libre_Baskerville, JetBrains_Mono } from "next/font/google";
+import { Libre_Baskerville, JetBrains_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
-
-const inter = Inter({ subsets: ["latin"] });
 
 const libreBaskerville = Libre_Baskerville({
   subsets: ["latin"],
@@ -30,7 +28,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} ${libreBaskerville.variable} ${jetBrainsMono.variable}`}>
+      <body className={`${libreBaskerville.variable} ${jetBrainsMono.variable}`}>
         {children}
         <Toaster />
       </body>
