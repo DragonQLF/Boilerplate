@@ -1,3 +1,5 @@
+// Must stay in sync with passwordSchema in backend/src/features/auth/auth.validation.ts.
+// If you change password rules here, update that file too (and vice versa).
 import { z } from "zod";
 
 export const passwordSchema = z
