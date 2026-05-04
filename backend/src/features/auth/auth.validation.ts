@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { Request, Response, NextFunction } from "express";
-
+// Must stay in sync with passwordSchema in frontend/features/auth/lib/password.ts.
 const passwordSchema = z
   .string()
   .min(8, "Password must be at least 8 characters")
